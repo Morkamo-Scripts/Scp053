@@ -493,17 +493,17 @@ public class Scp053Chaos : Scp053Component
     {
         RueDisplay.Get(player).Show(
             new Tag(),
-            new BasicElement(600, Description), 35);
+            new BasicElement(250, Description), 7);
 
-        Timing.CallDelayed(35.1f, () => RueDisplay.Get(player).Update());
+        Timing.CallDelayed(7.1f, () => RueDisplay.Get(player).Update());
             
         foreach (var spec in player.CurrentSpectatingPlayers)
         {
             RueDisplay.Get(spec).Show(
                 new Tag(),
-                new BasicElement(600, Description), 35);
+                new BasicElement(250, Description), 7);
             
-            Timing.CallDelayed(35.1f, () => RueDisplay.Get(spec).Update());
+            Timing.CallDelayed(7.1f, () => RueDisplay.Get(spec).Update());
         }
             
         while (player.IsConnected && player.IsAlive)
