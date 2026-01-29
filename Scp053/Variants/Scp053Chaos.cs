@@ -357,6 +357,8 @@ public class Scp053Chaos : Scp053Component
         if (!Check(ev.Player))
             return;
         
+        ev.Player.IsUsingStamina = true;
+        
         EventManager.PlayerEvents.InvokeCustomRoleDied(ev.Player, CustomRoleType.Scp053);
     }
     

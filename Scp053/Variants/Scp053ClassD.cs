@@ -44,8 +44,7 @@ public class Scp053ClassD : Scp053Component
                                                        "<color=#ff7640>Панацея - пассивное лечения себя (1Hp/0.5s) и союзников (1Hp/s).</color>\n" +
                                                        "<color=#ff6b60>Зеркало - возвращает 15% получаемого урона атакующему игроку.</color>\n" +
                                                        "<color=#ff5f7c>Сила жизни - вы можете отразить 100% критического урона \nраз в 60 секунд.</color>\n" +
-                                                       "<color=#ff548f>Любовь к сладкому - вы можете взять до 8 конфет SCP-330.</color>\n" +
-                                                       "<color=#ff489f>Под пеленой - скрывает вас и ваших союзников от сканера SCP-079.</color>\n" +
+                                                       "<color=#ff548f>Любовь к сладкому - вы можете взять до 6 конфет SCP-330.</color>\n" +
                                                        "<color=#ff3b68>Хороший доктор - медикаменты действуют эффективнее на вас \nи ваших союзников.</color>\n" +
                                                        "<color=#0883ff><size=40><b>Если SCP-053 связали, то она позитивно влияет\nна всю команду связавшего её игрока!</b></color></size>";
 
@@ -355,6 +354,8 @@ public class Scp053ClassD : Scp053Component
     {
         if (!Check(ev.Player))
             return;
+        
+        ev.Player.IsUsingStamina = true;
         
         EventManager.PlayerEvents.InvokeCustomRoleDied(ev.Player, CustomRoleType.Scp053);
     }
