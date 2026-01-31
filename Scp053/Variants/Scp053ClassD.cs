@@ -76,6 +76,7 @@ public class Scp053ClassD : Scp053Component
         events.Player.Escaped += OnEscaped;
         events.Scp330.InteractingScp330 += OnIntercatingWithScp330;
         events.Player.UsingItemCompleted += UsingItemComplete;
+        events.Player.ChangingRole += OnChangingRole;
         LabApi.Events.Handlers.PlayerEvents.Cuffed += OnCuffed;
         LabApi.Events.Handlers.PlayerEvents.Uncuffed += OnUncuffed;
         base.SubscribeEvents();
@@ -95,6 +96,7 @@ public class Scp053ClassD : Scp053Component
         events.Player.Escaped -= OnEscaped;
         events.Scp330.InteractingScp330 -= OnIntercatingWithScp330;
         events.Player.UsingItemCompleted -= UsingItemComplete;
+        events.Player.ChangingRole -= OnChangingRole;
         LabApi.Events.Handlers.PlayerEvents.Cuffed -= OnCuffed;
         LabApi.Events.Handlers.PlayerEvents.Uncuffed -= OnUncuffed;
         base.UnsubscribeEvents();
@@ -106,6 +108,12 @@ public class Scp053ClassD : Scp053Component
         player.AdvancedCassie().PlayerProperties.IsCustomScp = false;
         Object.Destroy(player.Scp053().PlayerProperties.HighlightPrefab);
         player.Scp053().PlayerProperties.HighlightPrefab = null;
+    }
+    
+    private void OnChangingRole(ChangingRoleEventArgs ev)
+    {
+        if (Check(ev.Player))
+            ev.Player.Scp053().ResetProperties();
     }
     
     private void OnSpawned(SpawnedEventArgs ev)
@@ -506,7 +514,7 @@ public class Scp053ClassD : Scp053Component
             Timing.CallDelayed(35.1f, () => RueDisplay.Get(spec).Update());
         }
         
-        while (player.IsConnected && player.IsAlive)
+        while (player.IsConnected && player.IsAlive && Check(player))
         {
             foreach (var spec in player.CurrentSpectatingPlayers)
             {

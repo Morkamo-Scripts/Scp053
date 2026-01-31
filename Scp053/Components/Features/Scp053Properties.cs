@@ -14,4 +14,13 @@ public sealed class Scp053Properties() : MonoBehaviour
     
     public Player Player { get; private set; }
     public PlayerProperties PlayerProperties { get; private set; }
+    
+    public void ResetProperties()
+    {
+        Destroy(PlayerProperties.HighlightPrefab);
+        PlayerProperties.HighlightPrefab = null;
+        PlayerProperties.IsInEscapingProcess = false;
+        PlayerProperties.Cuffer = null;
+        PlayerProperties.IsInAnomalyRange = false;
+    }
 }
