@@ -189,18 +189,12 @@ public class Scp053Chaos : Scp053Component
 
     private void UsingItemComplete(UsingItemCompletedEventArgs ev)
     {
-        if (ev.Player.IsNPC && !Check(ev.Player))
+        if (ev.Player.IsNPC || !Check(ev.Player))
             return;
         
         if (ev.Usable.Type == ItemType.Medkit)
         {
             ev.Player.Heal(35f);
-            return;
-        }
-        
-        if (ev.Usable.Type == ItemType.Painkillers)
-        {
-            ev.Player.Heal(20f);
         }
     }
     
