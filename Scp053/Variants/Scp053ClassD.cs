@@ -228,6 +228,12 @@ public class Scp053ClassD : Scp053Component
             return;
         }
         
+        if (ev.Effect.GetEffectType() == EffectType.CardiacArrest && ev.Intensity > 0)
+        {
+            ev.IsAllowed = false;
+            return;
+        }
+        
         if (ev.Effect.GetEffectType() == EffectType.NightVision && ev.Intensity == 0)
         {
             ev.IsAllowed = false;
