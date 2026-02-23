@@ -22,5 +22,6 @@ public sealed class Scp053Properties() : MonoBehaviour
         PlayerProperties.IsInEscapingProcess = false;
         PlayerProperties.Cuffer = null;
         PlayerProperties.IsInAnomalyRange = false;
+        Player.IsUsingStamina = true;
     }
 }

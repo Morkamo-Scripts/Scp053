@@ -62,6 +62,21 @@ public class Scp053ClassD : Scp053Component
     private Coroutine _phProcessor;
     private Coroutine _cProcessor;
 
+    private HashSet<EffectType> _allowedNegativeEffects = new()
+    {
+        EffectType.SeveredHands,
+        EffectType.PocketCorroding,
+        EffectType.Decontaminating,
+    };
+    
+    private HashSet<DamageType> _allowedDamageTypes = new()
+    {
+        DamageType.Warhead,
+        DamageType.Decontamination,
+        DamageType.PocketDimension,
+        DamageType.Crushed,
+    };
+
     protected override void SubscribeEvents()
     {
         EventManager.PlayerEvents.CustomRoleTypeDied += OnCustomRoleDied;
@@ -77,6 +92,7 @@ public class Scp053ClassD : Scp053Component
         events.Scp330.InteractingScp330 += OnIntercatingWithScp330;
         events.Player.UsingItemCompleted += UsingItemComplete;
         events.Player.ChangingRole += OnChangingRole;
+        events.Player.Hurting += OnHurting;
         LabApi.Events.Handlers.PlayerEvents.Cuffed += OnCuffed;
         LabApi.Events.Handlers.PlayerEvents.Uncuffed += OnUncuffed;
         base.SubscribeEvents();
@@ -97,6 +113,7 @@ public class Scp053ClassD : Scp053Component
         events.Scp330.InteractingScp330 -= OnIntercatingWithScp330;
         events.Player.UsingItemCompleted -= UsingItemComplete;
         events.Player.ChangingRole -= OnChangingRole;
+        events.Player.Hurting -= OnHurting;
         LabApi.Events.Handlers.PlayerEvents.Cuffed -= OnCuffed;
         LabApi.Events.Handlers.PlayerEvents.Uncuffed -= OnUncuffed;
         base.UnsubscribeEvents();
@@ -222,13 +239,8 @@ public class Scp053ClassD : Scp053Component
         if (ev.Player == null || !ev.Player.IsConnected || ev.Player.IsNPC || !Check(ev.Player))
             return;
         
-        if (ev.Effect.GetEffectType().IsNegative() && ev.Intensity != 0)
-        {
-            ev.IsAllowed = false;
-            return;
-        }
-        
-        if (ev.Effect.GetEffectType() == EffectType.CardiacArrest && ev.Intensity > 0)
+        if (ev.Effect.GetEffectType().IsNegative() && ev.Intensity != 0 && 
+            !_allowedNegativeEffects.Contains(ev.Effect.GetEffectType()))
         {
             ev.IsAllowed = false;
             return;
@@ -292,10 +304,21 @@ public class Scp053ClassD : Scp053Component
         
         ev.Attacker.Hurt(ev.Amount * 0.15f, "SCP-053 (Зеркальный урон)");
     }
+    
+    private void OnHurting(HurtingEventArgs ev)
+    {
+        if (ev.Player.IsNPC || !Check(ev.Player))
+            return;
+
+        
+    }
 
     private void OnDying(DyingEventArgs ev)
     {
         if (ev.Player.IsNPC || !Check(ev.Player))
+            return;
+        
+        if (_allowedDamageTypes.Contains(ev.DamageHandler.Type))
             return;
 
         if (ev.Player.IsEffectActive<AntiScp207>())
@@ -317,6 +340,8 @@ public class Scp053ClassD : Scp053Component
         {
             if (!ev.Player.IsDead)
             {
+                ev.Player.DisableEffect(EffectType.CardiacArrest);
+                
                 RueDisplay.Get(ev.Player).Show(
                     new Tag(),
                     new BasicElement(900,
@@ -427,7 +452,7 @@ public class Scp053ClassD : Scp053Component
         };
         properties.HighlightPrefab.transform.SetParent(player.Transform);
         
-        HighlightManager.ProceduralParticles(properties.HighlightPrefab, 
+        Components.Features.Utils.ProceduralParticles(player, properties.HighlightPrefab, 
             new Color32(20, 200, 255, 255), 0, 0.05f,
             new(1.2f, 1.2f, 1.2f), 0.125f, 12, 8, 60, 1f);
     }
@@ -546,12 +571,10 @@ public class Scp053ClassD : Scp053Component
                 if (Vector3.Distance(player.Position, center) > AnomalyRangeRadius)
                 {
                     player.Scp053().PlayerProperties.IsInAnomalyRange = false;
-                    Scp079Role.TurnedPlayers.Remove(player);
                     continue;
                 }
 
                 player.Scp053().PlayerProperties.IsInAnomalyRange = true;
-                Scp079Role.TurnedPlayers.Add(player);
             }
 
             yield return new WaitForSeconds(1f);
